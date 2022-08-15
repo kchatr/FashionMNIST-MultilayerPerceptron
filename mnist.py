@@ -31,3 +31,13 @@ def main():
     train_ds = train_ds.cache()
     test_ds = test_ds.cache()
 
+    # Initialize the Model
+    model = tf.keras.Sequential([
+        tf.keras.layers.Flatten(input_shape=(28, 28, 1)),
+        tf.keras.layers.Dense(128, activation=tf.nn.relu),
+        tf.keras.layers.Dense(10, activation=tf.nn.softmax())
+    ])
+
+    # Compile the Model
+    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy, metrics=['accuracy'])
+    
