@@ -24,5 +24,10 @@ def normalize_data(images):
     images /= 255
     return images
 
-
+def main():
+    # Normalize and Cache Data
+    train_ds = train_ds.map(normalize_data)
+    test_ds = test_ds.map(normalize_data)
+    train_ds = train_ds.cache()
+    test_ds = test_ds.cache()
 
