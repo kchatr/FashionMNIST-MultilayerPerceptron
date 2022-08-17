@@ -76,3 +76,7 @@ def main():
     test_ds=test_ds.cache().batch(BATCH_SIZE)
 
     model.fit(train_ds, epochs=5)
+
+    # Evaluate Model Accuracy
+    test_loss, test_accuracy = model.evaluate(test_ds)
+    print(f"Testing Loss and Accuracy: {test_loss}; {test_accuracy}")
