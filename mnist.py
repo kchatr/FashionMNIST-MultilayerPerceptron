@@ -14,12 +14,12 @@ logger = tf.get_logger()
 logger.setLevel(logging.ERROR)
 
 # Function for Normalizing Greyscale Pixel Values
-def normalize_data(images):
+def normalize_data(images, labels):
     images = tf.cast(images, tf.float32)
     images /= 255
-    return images
+    return images, labels
 
-def plot_image(index, pred_arr, labels, images):
+def plot_image(index, pred_arr, labels, class_names, images):
     predictions_array, label, img = pred_arr[index], labels[index], images[index] 
     plt.grid(False)
     plt.xticks([])
@@ -93,25 +93,25 @@ def main():
     # Initialize the Model
     model = tf.keras.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28, 1)),
-        tf.keras.layers.Dense(128, activation=tf.nn.relu),
-        tf.keras.layers.Dense(10, activation=tf.nn.softmax())
+        tf.keras.layers.Dense(128, activation=tf.keras.activations.relu),
+        tf.keras.layers.Dense(10, activation=tf.keras.activations.softmax)
     ])
-
     # Compile the Model
-    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy, metrics=['accuracy'])
+    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(), metrics=['accuracy'])
     
     # Train the Model
     BATCH_SIZE = 32
-    train_ds = train_ds.cache().repeat().shuffle(num_train_examples).batch(BATCH_SIZE)
+    train_ds = train_ds.cache().shuffle(num_train_examples).batch(BATCH_SIZE)
     test_ds=test_ds.cache().batch(BATCH_SIZE)
 
-    model.fit(train_ds, epochs=5)
+    model.fit(x=train_ds, epochs=5)
 
     # Evaluate Model Accuracy
     test_loss, test_accuracy = model.evaluate(test_ds)
     print(f"Testing Loss and Accuracy: {test_loss}; {test_accuracy}")
 
     # Generate Predictions on Test Set
+    predictions, test_images, test_labels = None, None, None
     for test_images, test_labels in test_ds.take(1):
         test_images = test_images.numpy()
         test_labels = test_labels.numpy()
@@ -121,10 +121,14 @@ def main():
     num_rows = 5
     num_cols = 3
     num_images = num_rows*num_cols
+    
     plt.figure(figsize=(2*2*num_cols, 2*num_rows))
     for i in range(num_images):
         plt.subplot(num_rows, 2*num_cols, 2*i+1)
-        plot_image(i, predictions, test_labels, test_images)
+        plot_image(i, predictions, test_labels, class_names, test_images)
         plt.subplot(num_rows, 2*num_cols, 2*i+2)
         plot_val_array(i, predictions, test_labels)
+    plt.show()
 
+if __name__ == "__main__":
+    main()
